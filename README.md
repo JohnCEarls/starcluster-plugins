@@ -3,8 +3,8 @@ starcluster-plugins
 
 collection of my starcluster plugins
 
-tagger
-------
+tagger.py
+---------
 Starcluster plugin that adds tags to ec2 instances on startup
 
 Copy to plugins folder and add similar to config
