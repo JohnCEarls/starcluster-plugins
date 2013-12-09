@@ -1,7 +1,7 @@
 starcluster-plugins
 ===================
 
-collection of my starcluster plugins
+Collection of my starcluster plugins
 
 tagger.py
 ---------
