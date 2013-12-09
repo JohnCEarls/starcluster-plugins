@@ -9,9 +9,9 @@ Starcluster plugin that adds tags to ec2 instances on startup
 
 Copy to plugins folder and add similar to config
 
-  [plugin base-tagger]
-  setup_class=tagger.Tagger
-  tags = key:value, started-by:John C. Earls, project: testing,  mydate:[[date]], myalias:  [[alias]], localuser:[[localuser]], 
+    [plugin base-tagger]
+    setup_class=tagger.Tagger
+    tags = key:value, started-by:John C. Earls, project: testing,  mydate:[[date]], myalias:  [[alias]], localuser:[[localuser]], 
 
 Has a few variables that can be used as values.
 - [[date]] - datetime in UTC
