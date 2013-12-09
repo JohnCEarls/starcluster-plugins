@@ -6,8 +6,16 @@ from datetime import datetime
 import getpass
 import re
 
-
 class Tagger(DefaultClusterSetup):
+    """
+    Plugin that adds arbitrary tags to all nodes on startup.
+
+    Plugin sig in config like
+
+    [plugin base-tagger]
+    setup_class=tagger.Tagger
+    tags = key:value, started-by:John C. Earls, ...
+    """
     def __init__(self, tags, tag_date=False):
         super(Tagger, self).__init__()
         self.tags = self.parse_tags(tags)
@@ -26,7 +34,8 @@ class Tagger(DefaultClusterSetup):
 
     def add_tags(self, node):
         for key, value in self.tags.iteritems():
-            log.debug("key: <%s>, value: <%s>" % (key,self.get_value(value, node)))
+            log.debug("key: <%s>, value: <%s>" % 
+                    (key,self.get_value(value, node)))
             node.add_tag(key,self.get_value(value,node))
         log.info('Tagged %s' % node.alias)
 
@@ -45,7 +54,6 @@ class Tagger(DefaultClusterSetup):
         [[master]] - name of this nodes master
         [[localuser]] - user name of person that started cluster, 
             according to machine cluster started from
-
         """
         auto_pattern = r'\[\[(.+)\]\]'
         auto_v = re.match(auto_pattern, value)
