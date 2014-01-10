@@ -16,7 +16,7 @@ class S3ShellPlugin(DefaultClusterSetup):
     """
     def __init__(self, s3_file_path ):
         super(S3ShellPlugin, self).__init__()
-        parsed = s3_filepath[5:].split('/')
+        parsed = s3_file_path[5:].split('/')
         self.bucket = parsed[0]
         self.path = '/'.join(parsed[1:])
 
