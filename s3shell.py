@@ -15,7 +15,7 @@ class S3ShellPlugin(DefaultClusterSetup):
     s3_file_path = s3://mybucket/path/to/script.sh
     """
     def __init__(self, s3_file_path ):
-        super(UserInit, self).__init__()
+        super(S3ShellPlugin, self).__init__()
         parsed = s3_filepath[5:].split('/')
         self.bucket = parsed[0]
         self.path = '/'.join(parsed[1:])
