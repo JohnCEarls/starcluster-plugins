@@ -21,7 +21,20 @@ class S3ShellPlugin(DefaultClusterSetup):
         self.path = '/'.join(parsed[1:])
 
     def run(self, nodes, master, user, user_shell, volumes):
-        self.run_scripts( nodes, user )
+        ctr = 0
+        complete = False
+        while not complete and ctr < 3:
+            if ctr > 0:
+                log.info( "Retrying initialization")
+            try:
+                self.run_scripts( nodes, user )
+                complete = True
+            except:
+                log.exception("!!!S3shell plugin failed!!!")
+                ctr += 1
+        if not complete:
+            log.error("Unable to run S3shell.  Tried %i times." % ctr)
+                #this plugin failing should not stop startup
 
     def run_scripts(self, nodes, user):
         _, script =  os.path.split(self.path)
@@ -42,4 +55,18 @@ class S3ShellPlugin(DefaultClusterSetup):
         self.pool.wait(len(nodes))
 
     def on_add_node(self, new_node, nodes, master, user, user_shell, volumes):
-        self.run_scripts( [new_node], user )
+        ctr = 0
+        complete = False
+        while not complete and ctr < 3:
+            if ctr > 0:
+                log.info( "Retrying initialization")
+            try:
+                self.run_scripts( [new_node], user )
+                complete = True
+            except:
+                log.exception("!!!S3shell plugin failed!!!")
+                #this plugin failing should not stop startup
+                ctr += 1
+        if not complete:
+            log.error("Unable to run S3shell.  Tried %i times." % ctr)
+                #this plugin failing should not stop startup
