@@ -20,7 +20,7 @@ class S3ShellPlugin(DefaultClusterSetup):
         self.bucket = parsed[0]
         self.path = '/'.join(parsed[1:])
 
-    def run( nodes, master, user, user_shell, volumes):
+    def run(self, nodes, master, user, user_shell, volumes):
         self.run_scripts( nodes, user )
 
     def run_scripts(self, nodes, user):
