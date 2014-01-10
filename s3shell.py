@@ -25,9 +25,9 @@ class S3ShellPlugin(DefaultClusterSetup):
 
     def run_scripts(self, nodes, user):
         log.info("Running %s on all nodes.")
-        _, script =  os.path.split(self.s3_file_path)
+        _, script =  os.path.split(self.path)
         cmd1 = 'aws --region=us-east-1 cp s3://%s/%s /home/%s/%s' %\
-                (self.bucket, self.s3_file_path, user, script)
+                (self.bucket, self.path, user, script)
         log.info("Running %s on all nodes." % cmd1)
         for node in nodes:
             nssh = node.ssh
