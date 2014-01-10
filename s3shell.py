@@ -24,7 +24,6 @@ class S3ShellPlugin(DefaultClusterSetup):
         self.run_scripts( nodes, user )
 
     def run_scripts(self, nodes, user):
-        log.info("Running %s on all nodes.")
         _, script =  os.path.split(self.path)
         cmd1 = 'aws s3 --region=us-east-1 cp s3://%s/%s /home/%s/%s' %\
                 (self.bucket, self.path, user, script)
@@ -34,7 +33,7 @@ class S3ShellPlugin(DefaultClusterSetup):
             nssh.switch_user(user)
             self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
         self.pool.wait(len(nodes))
-        cmd2 = 'bash /home/%s/%s' %  ( user, script )
+        cmd2 = 'bash /home/%s/%s &> user-bootstrap.log' %  ( user, script )
         log.info("Running $ %s on all nodes." % cmd2)
         for node in nodes:
             nssh = node.ssh
