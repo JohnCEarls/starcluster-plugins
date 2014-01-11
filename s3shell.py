@@ -28,11 +28,9 @@ class S3ShellPlugin(DefaultClusterSetup):
             if ctr > 0:
                 log.info( "Retrying initialization")
             try:
-                self.run_scripts( [master], user )
+                
+                self.run_scripts( master, user )
                 complete = True
-            except exception.ThreadPoolException as t:
-                log.exception("Threadpool exception, try without threads")
-                self.run_scripts( nodes, user, True )
             except:
                 log.exception("!!!S3shell plugin failed!!!")
                 ctr += 1
@@ -40,31 +38,21 @@ class S3ShellPlugin(DefaultClusterSetup):
             log.error("Unable to run S3shell.  Tried %i times." % ctr)
                 #this plugin failing should not stop startup
 
-    def run_scripts(self, nodes, user, noThreads=False):
+    def run_once( self, master_ssh, cmd )
+        log.info("Running %s on master." % cmd)
+        master_ssh.execute( cmd , silent=False )
+        log.info("%s complete." %cmd)
+
+    def run_scripts(self, master, user ):
         _, script =  os.path.split(self.path)
         cmd1 = 'aws s3 --region=us-east-1 cp s3://%s/%s /home/%s/%s' %\
                 (self.bucket, self.path, user, script)
-        log.info("Running %s on all nodes." % cmd1)
-        for node in nodes:
-            nssh = node.ssh
-            nssh.switch_user(user)
-            if noThreads:
-                nssh.execute( cmd1 )
-            else:
-                self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
-        if not noThreads:
-            self.pool.wait(len(nodes))
-        cmd2 = 'source /home/%s/.bashrc && bash /home/%s/%s &>> bootstrap.log' %  ( user, user, script )
-        log.info("Running $ %s on all nodes." % cmd2)
-        for node in nodes:
-            nssh = node.ssh
-            nssh.switch_user(user)
-            if noThreads:
-                nssh.execute( cmd1 )
-            else:
-                self.pool.simple_job( nssh.execute, (cmd2,), jobid= node.alias)
-        if not noThreads:
-            self.pool.wait(len(nodes))
+        cmd2 = 'bash /home/%s/%s &>> bootstrap.log' %  ( user, user, script )
+        cmds = (cmd1, cmd2)
+        mssh = master.ssh
+        mssh.switch_user(user)
+        for cmd in cmds:
+            self.run_once( mssh, cmd )
 
     def on_add_node(self, new_node, nodes, master, user, user_shell, volumes):
         ctr = 0
