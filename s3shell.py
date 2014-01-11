@@ -6,6 +6,7 @@ from datetime import datetime
 import getpass
 import re
 import os.path
+from starcluster import exception
 
 class S3ShellPlugin(DefaultClusterSetup):
     """
@@ -29,6 +30,9 @@ class S3ShellPlugin(DefaultClusterSetup):
             try:
                 self.run_scripts( nodes, user )
                 complete = True
+            except exception.TheadpoolException as t:
+                log.exception("Threadpool exception, try without threads")
+                self.run_scripts( nodes, user, True )
             except:
                 log.exception("!!!S3shell plugin failed!!!")
                 ctr += 1
@@ -36,7 +40,7 @@ class S3ShellPlugin(DefaultClusterSetup):
             log.error("Unable to run S3shell.  Tried %i times." % ctr)
                 #this plugin failing should not stop startup
 
-    def run_scripts(self, nodes, user):
+    def run_scripts(self, nodes, user, noThreads=False):
         _, script =  os.path.split(self.path)
         cmd1 = 'aws s3 --region=us-east-1 cp s3://%s/%s /home/%s/%s' %\
                 (self.bucket, self.path, user, script)
@@ -44,15 +48,23 @@ class S3ShellPlugin(DefaultClusterSetup):
         for node in nodes:
             nssh = node.ssh
             nssh.switch_user(user)
-            self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
-        self.pool.wait(len(nodes))
+            if noTheads:
+                nssh.execute( cmd1 )
+            else:
+                self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
+        if not noThreads:
+            self.pool.wait(len(nodes))
         cmd2 = 'bash /home/%s/%s &> user-bootstrap.log' %  ( user, script )
         log.info("Running $ %s on all nodes." % cmd2)
         for node in nodes:
             nssh = node.ssh
             nssh.switch_user(user)
-            self.pool.simple_job( nssh.execute, (cmd2,), jobid= node.alias)
-        self.pool.wait(len(nodes))
+            if noTheads:
+                nssh.execute( cmd1 )
+            else:
+                self.pool.simple_job( nssh.execute, (cmd2,), jobid= node.alias)
+        if not noThreads:
+            self.pool.wait(len(nodes))
 
     def on_add_node(self, new_node, nodes, master, user, user_shell, volumes):
         ctr = 0
