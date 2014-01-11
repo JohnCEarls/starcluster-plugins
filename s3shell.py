@@ -30,7 +30,7 @@ class S3ShellPlugin(DefaultClusterSetup):
             try:
                 self.run_scripts( nodes, user )
                 complete = True
-            except exception.TheadPoolException as t:
+            except exception.ThreadPoolException as t:
                 log.exception("Threadpool exception, try without threads")
                 self.run_scripts( nodes, user, True )
             except:
