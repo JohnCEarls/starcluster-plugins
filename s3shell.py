@@ -28,7 +28,7 @@ class S3ShellPlugin(DefaultClusterSetup):
             if ctr > 0:
                 log.info( "Retrying initialization")
             try:
-                self.run_scripts( nodes, user )
+                self.run_scripts( [master], user )
                 complete = True
             except exception.ThreadPoolException as t:
                 log.exception("Threadpool exception, try without threads")
@@ -54,7 +54,7 @@ class S3ShellPlugin(DefaultClusterSetup):
                 self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
         if not noThreads:
             self.pool.wait(len(nodes))
-        cmd2 = 'bash /home/%s/%s &>> bootstrap.log' %  ( user, script )
+        cmd2 = 'source /home/%s/.bashrc && bash /home/%s/%s &>> bootstrap.log' %  ( user, user, script )
         log.info("Running $ %s on all nodes." % cmd2)
         for node in nodes:
             nssh = node.ssh
@@ -81,4 +81,4 @@ class S3ShellPlugin(DefaultClusterSetup):
                 ctr += 1
         if not complete:
             log.error("Unable to run S3shell.  Tried %i times." % ctr)
-                #this plugin failing should not stop startup
+            #this plugin failing should not stop startup
