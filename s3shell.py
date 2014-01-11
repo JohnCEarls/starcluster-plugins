@@ -28,7 +28,6 @@ class S3ShellPlugin(DefaultClusterSetup):
             if ctr > 0:
                 log.info( "Retrying initialization")
             try:
-                
                 self.run_scripts( master, user )
                 complete = True
             except:
@@ -36,12 +35,12 @@ class S3ShellPlugin(DefaultClusterSetup):
                 ctr += 1
         if not complete:
             log.error("Unable to run S3shell.  Tried %i times." % ctr)
-                #this plugin failing should not stop startup
+            #this plugin failing should not stop startup
 
-    def run_once( self, master_ssh, cmd )
+    def run_once( self, master_ssh, cmd ):
         log.info("Running %s on master." % cmd)
         master_ssh.execute( cmd , silent=False )
-        log.info("%s complete." %cmd)
+        log.info("%s complete." % cmd)
 
     def run_scripts(self, master, user ):
         _, script =  os.path.split(self.path)
@@ -53,20 +52,3 @@ class S3ShellPlugin(DefaultClusterSetup):
         mssh.switch_user(user)
         for cmd in cmds:
             self.run_once( mssh, cmd )
-
-    def on_add_node(self, new_node, nodes, master, user, user_shell, volumes):
-        ctr = 0
-        complete = False
-        while not complete and ctr < 3:
-            if ctr > 0:
-                log.info( "Retrying initialization")
-            try:
-                self.run_scripts( [new_node], user )
-                complete = True
-            except:
-                log.exception("!!!S3shell plugin failed!!!")
-                #this plugin failing should not stop startup
-                ctr += 1
-        if not complete:
-            log.error("Unable to run S3shell.  Tried %i times." % ctr)
-            #this plugin failing should not stop startup
