@@ -48,7 +48,7 @@ class S3ShellPlugin(DefaultClusterSetup):
         for node in nodes:
             nssh = node.ssh
             nssh.switch_user(user)
-            if noTheads:
+            if noThreads:
                 nssh.execute( cmd1 )
             else:
                 self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
@@ -59,7 +59,7 @@ class S3ShellPlugin(DefaultClusterSetup):
         for node in nodes:
             nssh = node.ssh
             nssh.switch_user(user)
-            if noTheads:
+            if noThreads:
                 nssh.execute( cmd1 )
             else:
                 self.pool.simple_job( nssh.execute, (cmd2,), jobid= node.alias)
