@@ -54,7 +54,7 @@ class S3ShellPlugin(DefaultClusterSetup):
                 self.pool.simple_job( nssh.execute, (cmd1,), jobid= node.alias)
         if not noThreads:
             self.pool.wait(len(nodes))
-        cmd2 = 'bash /home/%s/%s &> user-bootstrap.log' %  ( user, script )
+        cmd2 = 'bash /home/%s/%s &>> bootstrap.log' %  ( user, script )
         log.info("Running $ %s on all nodes." % cmd2)
         for node in nodes:
             nssh = node.ssh
