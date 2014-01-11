@@ -46,7 +46,7 @@ class S3ShellPlugin(DefaultClusterSetup):
         _, script =  os.path.split(self.path)
         cmd1 = 'aws s3 --region=us-east-1 cp s3://%s/%s /home/%s/%s' %\
                 (self.bucket, self.path, user, script)
-        cmd2 = 'bash /home/%s/%s &>> bootstrap.log' %  ( user, user, script )
+        cmd2 = 'bash /home/%s/%s &>> bootstrap.log' %  (  user, script )
         cmds = (cmd1, cmd2)
         mssh = master.ssh
         mssh.switch_user(user)
