@@ -65,5 +65,6 @@ class S3ShellPlugin(DefaultClusterSetup):
         cmd2 = 'bash /root/%s &>> bootstrap.log' %  (  script, )
         cmds = (cmd1, cmd2)
         mssh = master.ssh
+        mssh.switch_user('root')
         for cmd in cmds:
             self.run_once( mssh, cmd )
