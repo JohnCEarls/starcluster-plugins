@@ -15,20 +15,25 @@ class S3ShellPlugin(DefaultClusterSetup):
     [plugin userinit]
     s3_file_path = s3://mybucket/path/to/script.sh
     """
-    def __init__(self, s3_file_path ):
+    def __init__(self, s3_file_path, user = None ):
         super(S3ShellPlugin, self).__init__()
         parsed = s3_file_path[5:].split('/')
         self.bucket = parsed[0]
         self.path = '/'.join(parsed[1:])
+        self._user = user
 
     def run(self, nodes, master, user, user_shell, volumes):
         ctr = 0
         complete = False
+
         while not complete and ctr < 3:
             if ctr > 0:
                 log.info( "Retrying initialization")
             try:
-                self.run_scripts( master, user )
+                if self._user != 'root':
+                    self.run_scripts( master, user )
+                else:
+                    self.run_scripts_root( master )
                 complete = True
             except:
                 log.exception("!!!S3shell plugin failed!!!")
@@ -50,5 +55,15 @@ class S3ShellPlugin(DefaultClusterSetup):
         cmds = (cmd1, cmd2)
         mssh = master.ssh
         mssh.switch_user(user)
+        for cmd in cmds:
+            self.run_once( mssh, cmd )
+
+    def run_scripts_root(self, master ):
+        _, script =  os.path.split(self.path)
+        cmd1 = 'aws s3 --region=us-east-1 cp s3://%s/%s /root/%s' %\
+                (self.bucket, self.path, script)
+        cmd2 = 'bash /root/%s &>> bootstrap.log' %  (  script, )
+        cmds = (cmd1, cmd2)
+        mssh = master.ssh
         for cmd in cmds:
             self.run_once( mssh, cmd )
