@@ -18,3 +18,13 @@ Has a few variables that can be used as values.
 - [[alias]] - node name
 - [[localuser]] - users name on computer that is starting the cluster
 - [[master]] - name of the master node for this starcluster
+
+s3shell.py
+----------
+Starcluster plugin that has nodes download a shell script from s3 and runs it on the node.
+
+    [plugin web-bootstrap]
+    setup_class=s3shell.S3ShellPlugin
+    s3_file_path=s3://<s3 bucket name>/<path>/<shell script>
+    user=root #optional, runs as sgeadmin by default
+    
